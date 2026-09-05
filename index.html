@@ -9,58 +9,69 @@
 <body>
     <div class="calculator-container">
         <div class="header">
-            <h1>计算器</h1>
-            <button id="themeToggle" class="theme-toggle">🌙</button>
-        </div>
-        <div class="calculator">
-            <div class="display-section">
-                <input type="text" id="display" readonly>
-                <div class="history-indicator" id="historyIndicator"></div>
-            </div>
-            <div class="buttons">
-                <!-- Row 1: Clear and Basic Operations -->
-                <button class="btn clear" onclick="clearDisplay()">C</button>
-                <button class="btn function" onclick="toggleSign()">+/-</button>
-                <button class="btn function" onclick="appendFunction('%')">%</button>
-                <button class="btn" onclick="appendOperator('/')">÷</button>
-
-                <!-- Row 2: Scientific Functions -->
-                <button class="btn function" onclick="appendFunction('sqrt')">√</button>
-                <button class="btn function" onclick="appendFunction('x²')">x²</button>
-                <button class="btn function" onclick="appendFunction('1/x')">1/x</button>
-                <button class="btn" onclick="appendOperator('*')">×</button>
-
-                <!-- Row 3: Numbers 7-9 -->
-                <button class="btn" onclick="appendNumber('7')">7</button>
-                <button class="btn" onclick="appendNumber('8')">8</button>
-                <button class="btn" onclick="appendNumber('9')">9</button>
-                <button class="btn" onclick="appendOperator('-')">-</button>
-
-                <!-- Row 4: Numbers 4-6 -->
-                <button class="btn" onclick="appendNumber('4')">4</button>
-                <button class="btn" onclick="appendNumber('5')">5</button>
-                <button class="btn" onclick="appendNumber('6')">6</button>
-                <button class="btn" onclick="appendOperator('+')">+</button>
-
-                <!-- Row 5: Numbers 1-3 -->
-                <button class="btn" onclick="appendNumber('1')">1</button>
-                <button class="btn" onclick="appendNumber('2')">2</button>
-                <button class="btn" onclick="appendNumber('3')">3</button>
-                <button class="btn equals" onclick="calculate()">=</button>
-
-                <!-- Row 6: Zero and Decimal -->
-                <button class="btn zero" onclick="appendNumber('0')">0</button>
-                <button class="btn" onclick="appendNumber('.')">.</button>
-                <button class="btn delete" onclick="deleteLast()">DEL</button>
+            <h1>🧮 计算器</h1>
+            <div class="header-controls">
+                <button id="themeToggle" class="theme-toggle" title="切换主题">🌙</button>
+                <button id="scientificToggle" class="scientific-toggle" title="科学模式">🔬</button>
             </div>
         </div>
-        <!-- History Panel -->
-        <div class="history-panel">
-            <div class="history-header">
-                <h3>历史记录</h3>
-                <button class="history-clear" onclick="clearHistory()">清除</button>
+        <div class="main-content">
+            <div class="calculator">
+                <div class="display-section">
+                    <input type="text" id="display" readonly>
+                    <div class="history-indicator" id="historyIndicator"></div>
+                </div>
+                <div class="buttons">
+                    <!-- Row 1: Clear and Basic Operations -->
+                    <button class="btn clear" onclick="clearDisplay()">C</button>
+                    <button class="btn function" onclick="toggleSign()">+/-</button>
+                    <button class="btn function" onclick="appendFunction('%')">%</button>
+                    <button class="btn" onclick="appendOperator('/')" title="除法">÷</button>
+
+                    <!-- Row 2: Scientific Functions -->
+                    <button class="btn function" onclick="appendFunction('sqrt')" title="平方根">√</button>
+                    <button class="btn function" onclick="appendFunction('x²')" title="平方">x²</button>
+                    <button class="btn function" onclick="appendFunction('1/x')" title="倒数">1/x</button>
+                    <button class="btn" onclick="appendOperator('*')" title="乘法">×</button>
+
+                    <!-- Row 3: Scientific Mode Buttons -->
+                    <button class="btn function scientific-btn" onclick="appendFunction('sin')" title="正弦">sin</button>
+                    <button class="btn function scientific-btn" onclick="appendFunction('cos')" title="余弦">cos</button>
+                    <button class="btn function scientific-btn" onclick="appendFunction('tan')" title="正切">tan</button>
+                    <button class="btn function scientific-btn" onclick="appendFunction('log')" title="对数">log</button>
+
+                    <!-- Row 4: Numbers 7-9 -->
+                    <button class="btn" onclick="appendNumber('7')">7</button>
+                    <button class="btn" onclick="appendNumber('8')">8</button>
+                    <button class="btn" onclick="appendNumber('9')">9</button>
+                    <button class="btn" onclick="appendOperator('-')" title="减法">-</button>
+
+                    <!-- Row 5: Numbers 4-6 -->
+                    <button class="btn" onclick="appendNumber('4')">4</button>
+                    <button class="btn" onclick="appendNumber('5')">5</button>
+                    <button class="btn" onclick="appendNumber('6')">6</button>
+                    <button class="btn" onclick="appendOperator('+')" title="加法">+</button>
+
+                    <!-- Row 6: Numbers 1-3 -->
+                    <button class="btn" onclick="appendNumber('1')">1</button>
+                    <button class="btn" onclick="appendNumber('2')">2</button>
+                    <button class="btn" onclick="appendNumber('3')">3</button>
+                    <button class="btn equals" onclick="calculate()" title="计算结果">=</button>
+
+                    <!-- Row 7: Zero and Decimal -->
+                    <button class="btn zero" onclick="appendNumber('0')">0</button>
+                    <button class="btn" onclick="appendNumber('.')">.</button>
+                    <button class="btn delete" onclick="deleteLast()">DEL</button>
+                </div>
             </div>
-            <div class="history-list" id="historyList"></div>
+            <!-- History Panel -->
+            <div class="history-panel">
+                <div class="history-header">
+                    <h3>📋 历史记录</h3>
+                    <button class="history-clear" onclick="clearHistory()" title="清除历史">清除</button>
+                </div>
+                <div class="history-list" id="historyList"></div>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>

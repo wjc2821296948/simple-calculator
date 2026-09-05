@@ -52,10 +52,9 @@ body {
 
 .calculator-container {
     display: flex;
+    flex-direction: column;
     gap: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .header {
@@ -63,7 +62,6 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
     padding: 0 20px;
 }
 
@@ -73,7 +71,13 @@ body {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.theme-toggle {
+.header-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.theme-toggle,
+.scientific-toggle {
     background: rgba(255, 255, 255, 0.2);
     border: 2px solid white;
     border-radius: 50%;
@@ -82,11 +86,25 @@ body {
     font-size: 24px;
     cursor: pointer;
     transition: all 0.3s ease;
+    color: white;
 }
 
-.theme-toggle:hover {
+.theme-toggle:hover,
+.scientific-toggle:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: scale(1.1);
+}
+
+.scientific-toggle.active {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.main-content {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .calculator {
@@ -114,6 +132,8 @@ body {
     font-weight: 500;
     color: var(--text-primary);
     transition: all 0.2s ease;
+    word-wrap: break-word;
+    word-break: break-all;
 }
 
 #display:focus {
@@ -137,7 +157,7 @@ body {
 }
 
 .btn {
-    padding: 20px;
+    padding: 18px;
     font-size: 16px;
     border: none;
     border-radius: 10px;
@@ -161,7 +181,6 @@ body {
 .btn.clear {
     background-color: var(--btn-clear);
     color: white;
-    grid-column: span 1;
 }
 
 .btn.clear:hover {
@@ -192,6 +211,16 @@ body {
 
 .btn.zero {
     grid-column: span 2;
+}
+
+.scientific-btn {
+    display: none;
+    font-size: 12px;
+    padding: 12px;
+}
+
+.scientific-btn.show {
+    display: block;
 }
 
 /* History Panel */
@@ -250,11 +279,18 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     border-left: 3px solid var(--btn-equals);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .history-item:hover {
     background: var(--btn-hover);
     transform: translateX(5px);
+}
+
+.history-item-content {
+    flex: 1;
 }
 
 .history-item .expression {
@@ -266,6 +302,22 @@ body {
     color: var(--text-primary);
     font-weight: bold;
     margin-top: 3px;
+}
+
+.history-item-copy {
+    background: var(--btn-function);
+    color: white;
+    border: none;
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    margin-left: 8px;
+    transition: all 0.2s ease;
+}
+
+.history-item-copy:hover {
+    background: var(--btn-function-hover);
 }
 
 /* Scrollbar Styling */
@@ -289,14 +341,9 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .calculator-container {
+    .main-content {
         flex-direction: column;
         align-items: center;
-    }
-
-    .header {
-        width: 100%;
-        margin-bottom: 10px;
     }
 
     .calculator {
@@ -312,6 +359,10 @@ body {
 }
 
 @media (max-width: 480px) {
+    .header h1 {
+        font-size: 24px;
+    }
+
     .calculator {
         width: 100%;
         padding: 15px;
