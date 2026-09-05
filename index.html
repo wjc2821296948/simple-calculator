@@ -3,39 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Calculator</title>
+    <title>Advanced Calculator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="calculator-container">
+        <div class="header">
+            <h1>计算器</h1>
+            <button id="themeToggle" class="theme-toggle">🌙</button>
+        </div>
         <div class="calculator">
-            <div class="display">
+            <div class="display-section">
                 <input type="text" id="display" readonly>
+                <div class="history-indicator" id="historyIndicator"></div>
             </div>
             <div class="buttons">
+                <!-- Row 1: Clear and Basic Operations -->
                 <button class="btn clear" onclick="clearDisplay()">C</button>
+                <button class="btn function" onclick="toggleSign()">+/-</button>
+                <button class="btn function" onclick="appendFunction('%')">%</button>
                 <button class="btn" onclick="appendOperator('/')">÷</button>
-                <button class="btn" onclick="appendOperator('*')">×</button>
-                <button class="btn" onclick="deleteLast()">DEL</button>
 
+                <!-- Row 2: Scientific Functions -->
+                <button class="btn function" onclick="appendFunction('sqrt')">√</button>
+                <button class="btn function" onclick="appendFunction('x²')">x²</button>
+                <button class="btn function" onclick="appendFunction('1/x')">1/x</button>
+                <button class="btn" onclick="appendOperator('*')">×</button>
+
+                <!-- Row 3: Numbers 7-9 -->
                 <button class="btn" onclick="appendNumber('7')">7</button>
                 <button class="btn" onclick="appendNumber('8')">8</button>
                 <button class="btn" onclick="appendNumber('9')">9</button>
                 <button class="btn" onclick="appendOperator('-')">-</button>
 
+                <!-- Row 4: Numbers 4-6 -->
                 <button class="btn" onclick="appendNumber('4')">4</button>
                 <button class="btn" onclick="appendNumber('5')">5</button>
                 <button class="btn" onclick="appendNumber('6')">6</button>
                 <button class="btn" onclick="appendOperator('+')">+</button>
 
+                <!-- Row 5: Numbers 1-3 -->
                 <button class="btn" onclick="appendNumber('1')">1</button>
                 <button class="btn" onclick="appendNumber('2')">2</button>
                 <button class="btn" onclick="appendNumber('3')">3</button>
                 <button class="btn equals" onclick="calculate()">=</button>
 
+                <!-- Row 6: Zero and Decimal -->
                 <button class="btn zero" onclick="appendNumber('0')">0</button>
                 <button class="btn" onclick="appendNumber('.')">.</button>
+                <button class="btn delete" onclick="deleteLast()">DEL</button>
             </div>
+        </div>
+        <!-- History Panel -->
+        <div class="history-panel">
+            <div class="history-header">
+                <h3>历史记录</h3>
+                <button class="history-clear" onclick="clearHistory()">清除</button>
+            </div>
+            <div class="history-list" id="historyList"></div>
         </div>
     </div>
     <script src="script.js"></script>
