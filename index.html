@@ -11,6 +11,8 @@
         <div class="header">
             <h1>🧮 计算器</h1>
             <div class="header-controls">
+                <button id="undoBtn" class="control-btn" onclick="undo()" title="撤销 (Ctrl+Z)">↶</button>
+                <button id="redoBtn" class="control-btn" onclick="redo()" title="重做 (Ctrl+Y)">↷</button>
                 <button id="themeToggle" class="theme-toggle" title="切换主题">🌙</button>
                 <button id="scientificToggle" class="scientific-toggle" title="科学模式">🔬</button>
             </div>
@@ -34,7 +36,7 @@
                     <button class="btn function" onclick="appendFunction('1/x')" title="倒数">1/x</button>
                     <button class="btn" onclick="appendOperator('*')" title="乘法">×</button>
 
-                    <!-- Row 3: Scientific Mode Buttons -->
+                    <!-- Row 3: Scientific Mode Buttons (sin, cos, tan, log) -->
                     <button class="btn function scientific-btn" onclick="appendFunction('sin')" title="正弦">sin</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('cos')" title="余弦">cos</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('tan')" title="正切">tan</button>
@@ -58,7 +60,13 @@
                     <button class="btn" onclick="appendNumber('3')">3</button>
                     <button class="btn equals" onclick="calculate()" title="计算结果">=</button>
 
-                    <!-- Row 7: Zero and Decimal -->
+                    <!-- Row 7: Advanced Scientific Functions (ln, e, π) -->
+                    <button class="btn function scientific-btn" onclick="appendFunction('ln')" title="自然对数">ln</button>
+                    <button class="btn function scientific-btn" onclick="appendFunction('e')" title="欧拉数">e</button>
+                    <button class="btn function scientific-btn" onclick="appendFunction('π')" title="圆周率">π</button>
+                    <button class="btn" onclick="appendOperator('-')">−</button>
+
+                    <!-- Row 8: Zero and Decimal -->
                     <button class="btn zero" onclick="appendNumber('0')">0</button>
                     <button class="btn" onclick="appendNumber('.')">.</button>
                     <button class="btn delete" onclick="deleteLast()">DEL</button>

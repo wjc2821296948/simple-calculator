@@ -6,6 +6,11 @@ let isDarkMode = false;
 let isScientificMode = false;
 let angleMode = 'deg'; // 'deg' or 'rad'
 
+// Undo/Redo stacks
+let undoStack = [''];
+let redoStack = [];
+let currentIndex = 0;
+
 // Initialize
 loadHistory();
 loadTheme();
@@ -20,6 +25,7 @@ function appendNumber(num) {
         display.value += num;
     }
     updateHistoryIndicator();
+    saveState();
 }
 
 function appendOperator(operator) {
@@ -29,6 +35,7 @@ function appendOperator(operator) {
     } else {
         display.value += operator;
     }
+    saveState();
 }
 
 function isOperator(char) {
@@ -38,11 +45,58 @@ function isOperator(char) {
 function deleteLast() {
     display.value = display.value.toString().slice(0, -1);
     updateHistoryIndicator();
+    saveState();
 }
 
 function clearDisplay() {
     display.value = '';
     updateHistoryIndicator();
+    saveState();
+}
+
+// ============ Undo/Redo Functionality ============
+function saveState() {
+    // Remove any states after current index
+    undoStack = undoStack.slice(0, currentIndex + 1);
+    redoStack = [];
+    
+    // Add new state
+    undoStack.push(display.value);
+    currentIndex = undoStack.length - 1;
+    
+    // Limit history to 50 states
+    if (undoStack.length > 50) {
+        undoStack.shift();
+        currentIndex--;
+    }
+    
+    updateUndoRedoButtons();
+}
+
+function undo() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        display.value = undoStack[currentIndex];
+        updateHistoryIndicator();
+        updateUndoRedoButtons();
+    }
+}
+
+function redo() {
+    if (currentIndex < undoStack.length - 1) {
+        currentIndex++;
+        display.value = undoStack[currentIndex];
+        updateHistoryIndicator();
+        updateUndoRedoButtons();
+    }
+}
+
+function updateUndoRedoButtons() {
+    const undoBtn = document.getElementById('undoBtn');
+    const redoBtn = document.getElementById('redoBtn');
+    
+    if (undoBtn) undoBtn.disabled = currentIndex <= 0;
+    if (redoBtn) redoBtn.disabled = currentIndex >= undoStack.length - 1;
 }
 
 // ============ Scientific Functions ============
@@ -53,6 +107,7 @@ function toggleSign() {
     } else {
         display.value = '-' + display.value;
     }
+    saveState();
 }
 
 function appendFunction(func) {
@@ -114,6 +169,23 @@ function appendFunction(func) {
             result = Math.log10(currentValue);
             expression = `log(${currentValue})`;
             break;
+        case 'ln':
+            if (currentValue <= 0) {
+                display.value = 'Error';
+                setTimeout(() => display.value = '', 1500);
+                return;
+            }
+            result = Math.log(currentValue);
+            expression = `ln(${currentValue})`;
+            break;
+        case 'e':
+            result = Math.E;
+            expression = 'e';
+            break;
+        case 'π':
+            result = Math.PI;
+            expression = 'π';
+            break;
         default:
             return;
     }
@@ -121,6 +193,7 @@ function appendFunction(func) {
     result = Math.round(result * 100000000) / 100000000;
     display.value = result;
     addToHistory(expression, result);
+    saveState();
 }
 
 // ============ Calculation ============
@@ -133,6 +206,7 @@ function calculate() {
         lastCalculation = { expression, result };
         addToHistory(expression, result);
         display.value = result;
+        saveState();
     } catch (error) {
         display.value = 'Error';
         setTimeout(() => {
@@ -150,7 +224,7 @@ function addToHistory(expression, result) {
         timestamp: new Date().toLocaleTimeString()
     };
     history.unshift(historyItem);
-    if (history.length > 20) history.pop();
+    if (history.length > 50) history.pop();
     saveHistory();
     renderHistory();
     updateHistoryIndicator();
@@ -164,12 +238,15 @@ function renderHistory() {
         div.className = 'history-item';
         div.innerHTML = `
             <div class="history-item-content">
-                <div class="expression">${item.expression}</div>
+                <div class="expression">${escapeHtml(item.expression)}</div>
                 <div class="result">= ${item.result}</div>
             </div>
             <button class="history-item-copy" onclick="copyToClipboard('${item.result}')" title="复制结果">📋</button>
         `;
-        div.querySelector('.history-item-content').onclick = () => display.value = item.result;
+        div.querySelector('.history-item-content').onclick = () => {
+            display.value = item.result;
+            saveState();
+        };
         historyList.appendChild(div);
     });
 }
@@ -185,12 +262,29 @@ function clearHistory() {
 
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
-        // Show visual feedback
-        event.target.textContent = '✓';
+        const btn = event.target;
+        const original = btn.textContent;
+        btn.textContent = '✓';
+        btn.style.background = '#90EE90';
         setTimeout(() => {
-            event.target.textContent = '📋';
+            btn.textContent = original;
+            btn.style.background = '';
         }, 1000);
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        alert('复制失败，请重试');
     });
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
 }
 
 function updateHistoryIndicator() {
@@ -271,13 +365,19 @@ function loadScientificMode() {
 document.getElementById('scientificToggle').addEventListener('click', toggleScientificMode);
 loadScientificMode();
 
+// Initialize undo/redo buttons
+window.addEventListener('load', updateUndoRedoButtons);
+
 // ============ Keyboard Support ============
 document.addEventListener('keydown', function(event) {
     if (event.key >= '0' && event.key <= '9') {
         appendNumber(event.key);
     } else if (event.key === '.') {
         appendNumber('.');
-    } else if (event.key === '+' || event.key === '-' || event.key === '*' || event.key === '/') {
+    } else if (event.key === '+' || event.key === '*' || event.key === '/') {
+        event.preventDefault();
+        appendOperator(event.key);
+    } else if (event.key === '-' && !event.ctrlKey) {
         event.preventDefault();
         appendOperator(event.key);
     } else if (event.key === 'Enter' || event.key === '=') {
@@ -288,6 +388,12 @@ document.addEventListener('keydown', function(event) {
         deleteLast();
     } else if (event.key === 'Escape') {
         clearDisplay();
+    } else if (event.ctrlKey && event.key === 'z') {
+        event.preventDefault();
+        undo();
+    } else if ((event.ctrlKey && event.key === 'y') || (event.ctrlKey && event.shiftKey && event.key === 'z')) {
+        event.preventDefault();
+        redo();
     }
 });
 
