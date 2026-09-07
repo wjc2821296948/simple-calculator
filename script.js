@@ -5,15 +5,98 @@ let lastCalculation = null;
 let isDarkMode = false;
 let isScientificMode = false;
 let angleMode = 'deg'; // 'deg' or 'rad'
+let soundEnabled = true; // Sound toggle
 
 // Undo/Redo stacks
 let undoStack = [''];
 let redoStack = [];
 let currentIndex = 0;
 
+// Audio context for sound effects
+let audioContext = null;
+
 // Initialize
 loadHistory();
 loadTheme();
+loadSoundSetting();
+
+// ============ Sound Effects ============
+function initAudioContext() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+
+function playBeep(frequency = 800, duration = 50) {
+    if (!soundEnabled) return;
+    
+    try {
+        initAudioContext();
+        const now = audioContext.currentTime;
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.frequency.value = frequency;
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + duration / 1000);
+        
+        osc.start(now);
+        osc.stop(now + duration / 1000);
+    } catch (e) {
+        console.error('Error playing sound:', e);
+    }
+}
+
+function playSuccessSound() {
+    if (!soundEnabled) return;
+    
+    try {
+        initAudioContext();
+        const now = audioContext.currentTime;
+        const notes = [800, 1000, 1200];
+        
+        notes.forEach((freq, index) => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            osc.frequency.value = freq;
+            const startTime = now + (index * 0.05);
+            gain.gain.setValueAtTime(0.3, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.1);
+            
+            osc.start(startTime);
+            osc.stop(startTime + 0.1);
+        });
+    } catch (e) {
+        console.error('Error playing success sound:', e);
+    }
+}
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    localStorage.setItem('calculatorSound', soundEnabled);
+    const btn = document.getElementById('soundToggle');
+    if (btn) {
+        btn.textContent = soundEnabled ? '🔊' : '🔇';
+    }
+}
+
+function loadSoundSetting() {
+    const saved = localStorage.getItem('calculatorSound');
+    if (saved === 'false') {
+        soundEnabled = false;
+    }
+    const btn = document.getElementById('soundToggle');
+    if (btn) {
+        btn.textContent = soundEnabled ? '🔊' : '🔇';
+    }
+}
 
 // ============ Display Functions ============
 function appendNumber(num) {
@@ -27,6 +110,7 @@ function appendNumber(num) {
     updateHistoryIndicator();
     saveState();
     animateDisplay();
+    playBeep(600, 30);
 }
 
 function appendOperator(operator) {
@@ -38,6 +122,7 @@ function appendOperator(operator) {
     }
     saveState();
     animateDisplay();
+    playBeep(700, 30);
 }
 
 function isOperator(char) {
@@ -49,6 +134,7 @@ function deleteLast() {
     updateHistoryIndicator();
     saveState();
     animateDisplay();
+    playBeep(500, 25);
 }
 
 function clearDisplay() {
@@ -56,6 +142,7 @@ function clearDisplay() {
     updateHistoryIndicator();
     saveState();
     animateDisplay();
+    playBeep(400, 40);
 }
 
 // ============ Animation Functions ============
@@ -99,6 +186,7 @@ function undo() {
         updateHistoryIndicator();
         updateUndoRedoButtons();
         animateDisplay();
+        playBeep(650, 30);
     }
 }
 
@@ -109,6 +197,7 @@ function redo() {
         updateHistoryIndicator();
         updateUndoRedoButtons();
         animateDisplay();
+        playBeep(750, 30);
     }
 }
 
@@ -120,7 +209,17 @@ function updateUndoRedoButtons() {
     if (redoBtn) redoBtn.disabled = currentIndex >= undoStack.length - 1;
 }
 
-// ============ Scientific Functions ============
+// ============ Advanced Functions ============
+function factorial(n) {
+    if (n < 0) return NaN;
+    if (n === 0 || n === 1) return 1;
+    let result = 1;
+    for (let i = 2; i <= n; i++) {
+        result *= i;
+    }
+    return result;
+}
+
 function toggleSign() {
     if (display.value === '' || display.value === '0') return;
     if (display.value.startsWith('-')) {
@@ -130,6 +229,7 @@ function toggleSign() {
     }
     saveState();
     animateDisplay();
+    playBeep(600, 30);
 }
 
 function appendFunction(func) {
@@ -148,6 +248,7 @@ function appendFunction(func) {
         case 'sqrt':
             if (currentValue < 0) {
                 display.value = 'Error';
+                playBeep(300, 100);
                 setTimeout(() => display.value = '', 1500);
                 return;
             }
@@ -161,11 +262,30 @@ function appendFunction(func) {
         case '1/x':
             if (currentValue === 0) {
                 display.value = 'Error';
+                playBeep(300, 100);
                 setTimeout(() => display.value = '', 1500);
                 return;
             }
             result = 1 / currentValue;
             expression = `1/${currentValue}`;
+            break;
+        case 'x³':
+            result = currentValue * currentValue * currentValue;
+            expression = `${currentValue}³`;
+            break;
+        case '|x|':
+            result = Math.abs(currentValue);
+            expression = `|${currentValue}|`;
+            break;
+        case 'n!':
+            if (currentValue < 0 || currentValue !== Math.floor(currentValue)) {
+                display.value = 'Error';
+                playBeep(300, 100);
+                setTimeout(() => display.value = '', 1500);
+                return;
+            }
+            result = factorial(currentValue);
+            expression = `${currentValue}!`;
             break;
         case 'sin':
             const sinVal = angleMode === 'deg' ? currentValue * Math.PI / 180 : currentValue;
@@ -185,6 +305,7 @@ function appendFunction(func) {
         case 'log':
             if (currentValue <= 0) {
                 display.value = 'Error';
+                playBeep(300, 100);
                 setTimeout(() => display.value = '', 1500);
                 return;
             }
@@ -194,6 +315,7 @@ function appendFunction(func) {
         case 'ln':
             if (currentValue <= 0) {
                 display.value = 'Error';
+                playBeep(300, 100);
                 setTimeout(() => display.value = '', 1500);
                 return;
             }
@@ -217,6 +339,7 @@ function appendFunction(func) {
     addToHistory(expression, result);
     saveState();
     animateResult();
+    playSuccessSound();
 }
 
 // ============ Calculation ============
@@ -231,8 +354,10 @@ function calculate() {
         display.value = result;
         saveState();
         animateResult();
+        playSuccessSound();
     } catch (error) {
         display.value = 'Error';
+        playBeep(300, 100);
         animateDisplay();
         setTimeout(() => {
             display.value = '';
@@ -272,6 +397,7 @@ function renderHistory() {
             display.value = item.result;
             saveState();
             animateDisplay();
+            playBeep(750, 30);
         };
         historyList.appendChild(div);
     });
@@ -283,6 +409,7 @@ function clearHistory() {
         saveHistory();
         renderHistory();
         updateHistoryIndicator();
+        playBeep(500, 50);
     }
 }
 
@@ -292,6 +419,7 @@ function copyToClipboard(text) {
         const original = btn.textContent;
         btn.textContent = '✓';
         btn.style.background = '#90EE90';
+        playBeep(1000, 30);
         setTimeout(() => {
             btn.textContent = original;
             btn.style.background = '';
@@ -299,6 +427,7 @@ function copyToClipboard(text) {
     }).catch(err => {
         console.error('Failed to copy:', err);
         alert('复制失败，请重试');
+        playBeep(300, 100);
     });
 }
 
@@ -351,6 +480,7 @@ function toggleTheme() {
         localStorage.setItem('calculatorTheme', 'light');
         document.getElementById('themeToggle').textContent = '🌙';
     }
+    playBeep(800, 50);
 }
 
 function loadTheme() {
@@ -363,6 +493,9 @@ function loadTheme() {
 }
 
 document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+if (document.getElementById('soundToggle')) {
+    document.getElementById('soundToggle').addEventListener('click', toggleSound);
+}
 
 // ============ Scientific Mode Toggle ============
 function toggleScientificMode() {
@@ -379,6 +512,7 @@ function toggleScientificMode() {
         toggle.classList.remove('active');
         localStorage.setItem('scientificMode', 'false');
     }
+    playBeep(900, 50);
 }
 
 function loadScientificMode() {

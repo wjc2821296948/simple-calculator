@@ -13,6 +13,7 @@
             <div class="header-controls">
                 <button id="undoBtn" class="control-btn" onclick="undo()" title="撤销 (Ctrl+Z)">↶</button>
                 <button id="redoBtn" class="control-btn" onclick="redo()" title="重做 (Ctrl+Y)">↷</button>
+                <button id="soundToggle" class="control-btn" onclick="toggleSound()" title="音效开关">🔊</button>
                 <button id="themeToggle" class="theme-toggle" title="切换主题">🌙</button>
                 <button id="scientificToggle" class="scientific-toggle" title="科学模式">🔬</button>
             </div>
@@ -33,43 +34,47 @@
                     <!-- Row 2: Scientific Functions -->
                     <button class="btn function" onclick="appendFunction('sqrt')" title="平方根">√</button>
                     <button class="btn function" onclick="appendFunction('x²')" title="平方">x²</button>
-                    <button class="btn function" onclick="appendFunction('1/x')" title="倒数">1/x</button>
+                    <button class="btn function" onclick="appendFunction('x³')" title="立方">x³</button>
                     <button class="btn" onclick="appendOperator('*')" title="乘法">×</button>
 
-                    <!-- Row 3: Scientific Mode Buttons (sin, cos, tan, log) -->
+                    <!-- Row 3: Advanced Functions -->
+                    <button class="btn function" onclick="appendFunction('1/x')" title="倒数">1/x</button>
+                    <button class="btn function" onclick="appendFunction('|x|')" title="绝对值">|x|</button>
+                    <button class="btn function" onclick="appendFunction('n!')" title="阶乘">n!</button>
+                    <button class="btn" onclick="appendOperator('-')" title="减法">-</button>
+
+                    <!-- Row 4: Scientific Mode Buttons (sin, cos, tan, log) -->
                     <button class="btn function scientific-btn" onclick="appendFunction('sin')" title="正弦">sin</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('cos')" title="余弦">cos</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('tan')" title="正切">tan</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('log')" title="对数">log</button>
 
-                    <!-- Row 4: Numbers 7-9 -->
+                    <!-- Row 5: Numbers 7-9 -->
                     <button class="btn" onclick="appendNumber('7')">7</button>
                     <button class="btn" onclick="appendNumber('8')">8</button>
                     <button class="btn" onclick="appendNumber('9')">9</button>
-                    <button class="btn" onclick="appendOperator('-')" title="减法">-</button>
+                    <button class="btn" onclick="appendOperator('+')" title="加法">+</button>
 
-                    <!-- Row 5: Numbers 4-6 -->
+                    <!-- Row 6: Numbers 4-6 -->
                     <button class="btn" onclick="appendNumber('4')">4</button>
                     <button class="btn" onclick="appendNumber('5')">5</button>
                     <button class="btn" onclick="appendNumber('6')">6</button>
-                    <button class="btn" onclick="appendOperator('+')" title="加法">+</button>
+                    <button class="btn equals" onclick="calculate()" title="计算结果">=</button>
 
-                    <!-- Row 6: Numbers 1-3 -->
+                    <!-- Row 7: Numbers 1-3 -->
                     <button class="btn" onclick="appendNumber('1')">1</button>
                     <button class="btn" onclick="appendNumber('2')">2</button>
                     <button class="btn" onclick="appendNumber('3')">3</button>
-                    <button class="btn equals" onclick="calculate()" title="计算结果">=</button>
+                    <button class="btn" onclick="appendNumber('.')">.</button>
 
-                    <!-- Row 7: Advanced Scientific Functions (ln, e, π) -->
+                    <!-- Row 8: Advanced Scientific Functions (ln, e, π) -->
                     <button class="btn function scientific-btn" onclick="appendFunction('ln')" title="自然对数">ln</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('e')" title="欧拉数">e</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('π')" title="圆周率">π</button>
-                    <button class="btn" onclick="appendOperator('-')">−</button>
-
-                    <!-- Row 8: Zero and Decimal -->
-                    <button class="btn zero" onclick="appendNumber('0')">0</button>
-                    <button class="btn" onclick="appendNumber('.')">.</button>
                     <button class="btn delete" onclick="deleteLast()">DEL</button>
+
+                    <!-- Row 9: Zero -->
+                    <button class="btn zero" onclick="appendNumber('0')">0</button>
                 </div>
             </div>
             <!-- History Panel -->
