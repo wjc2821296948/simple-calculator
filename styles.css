@@ -76,6 +76,7 @@ body {
     gap: 10px;
 }
 
+.control-btn,
 .theme-toggle,
 .scientific-toggle {
     background: rgba(255, 255, 255, 0.2);
@@ -89,10 +90,21 @@ body {
     color: white;
 }
 
+.control-btn:hover,
 .theme-toggle:hover,
 .scientific-toggle:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: scale(1.1);
+}
+
+.control-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.control-btn:disabled:hover {
+    transform: scale(1);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .scientific-toggle.active {
@@ -134,6 +146,36 @@ body {
     transition: all 0.2s ease;
     word-wrap: break-word;
     word-break: break-all;
+    animation: displayPulse 0.3s ease;
+}
+
+@keyframes displayPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+#display.result-animation {
+    animation: resultBounce 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes resultBounce {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+        color: var(--btn-equals);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 #display:focus {
@@ -148,6 +190,16 @@ body {
     color: var(--text-secondary);
     margin-top: 5px;
     min-height: 18px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .buttons {
@@ -172,6 +224,7 @@ body {
 .btn:hover {
     background-color: var(--btn-hover);
     transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .btn:active {
@@ -263,6 +316,7 @@ body {
 
 .history-clear:hover {
     background: var(--btn-clear-hover);
+    transform: scale(1.05);
 }
 
 .history-list {
@@ -282,15 +336,29 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .history-item:hover {
     background: var(--btn-hover);
     transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .history-item-content {
     flex: 1;
+    cursor: pointer;
 }
 
 .history-item .expression {
@@ -318,6 +386,7 @@ body {
 
 .history-item-copy:hover {
     background: var(--btn-function-hover);
+    transform: scale(1.1);
 }
 
 /* Scrollbar Styling */
@@ -361,6 +430,18 @@ body {
 @media (max-width: 480px) {
     .header h1 {
         font-size: 24px;
+    }
+
+    .header-controls {
+        gap: 5px;
+    }
+
+    .control-btn,
+    .theme-toggle,
+    .scientific-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
     }
 
     .calculator {

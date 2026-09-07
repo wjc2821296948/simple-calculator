@@ -26,6 +26,7 @@ function appendNumber(num) {
     }
     updateHistoryIndicator();
     saveState();
+    animateDisplay();
 }
 
 function appendOperator(operator) {
@@ -36,6 +37,7 @@ function appendOperator(operator) {
         display.value += operator;
     }
     saveState();
+    animateDisplay();
 }
 
 function isOperator(char) {
@@ -46,12 +48,29 @@ function deleteLast() {
     display.value = display.value.toString().slice(0, -1);
     updateHistoryIndicator();
     saveState();
+    animateDisplay();
 }
 
 function clearDisplay() {
     display.value = '';
     updateHistoryIndicator();
     saveState();
+    animateDisplay();
+}
+
+// ============ Animation Functions ============
+function animateDisplay() {
+    display.style.animation = 'none';
+    setTimeout(() => {
+        display.style.animation = 'displayPulse 0.3s ease';
+    }, 10);
+}
+
+function animateResult() {
+    display.classList.remove('result-animation');
+    setTimeout(() => {
+        display.classList.add('result-animation');
+    }, 10);
 }
 
 // ============ Undo/Redo Functionality ============
@@ -79,6 +98,7 @@ function undo() {
         display.value = undoStack[currentIndex];
         updateHistoryIndicator();
         updateUndoRedoButtons();
+        animateDisplay();
     }
 }
 
@@ -88,6 +108,7 @@ function redo() {
         display.value = undoStack[currentIndex];
         updateHistoryIndicator();
         updateUndoRedoButtons();
+        animateDisplay();
     }
 }
 
@@ -108,6 +129,7 @@ function toggleSign() {
         display.value = '-' + display.value;
     }
     saveState();
+    animateDisplay();
 }
 
 function appendFunction(func) {
@@ -194,6 +216,7 @@ function appendFunction(func) {
     display.value = result;
     addToHistory(expression, result);
     saveState();
+    animateResult();
 }
 
 // ============ Calculation ============
@@ -207,8 +230,10 @@ function calculate() {
         addToHistory(expression, result);
         display.value = result;
         saveState();
+        animateResult();
     } catch (error) {
         display.value = 'Error';
+        animateDisplay();
         setTimeout(() => {
             display.value = '';
         }, 1500);
@@ -246,6 +271,7 @@ function renderHistory() {
         div.querySelector('.history-item-content').onclick = () => {
             display.value = item.result;
             saveState();
+            animateDisplay();
         };
         historyList.appendChild(div);
     });
@@ -394,6 +420,9 @@ document.addEventListener('keydown', function(event) {
     } else if ((event.ctrlKey && event.key === 'y') || (event.ctrlKey && event.shiftKey && event.key === 'z')) {
         event.preventDefault();
         redo();
+    } else if (event.ctrlKey && event.key === 's') {
+        event.preventDefault();
+        toggleScientificMode();
     }
 });
 
