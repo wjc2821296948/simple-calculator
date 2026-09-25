@@ -48,12 +48,15 @@
                     <button class="btn function scientific-btn" onclick="appendFunction('cos')" title="余弦">cos</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('tan')" title="正切">tan</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('log')" title="对数">log</button>
+                    <button class="btn" onclick="appendParenthesis('(')" title="左括号">(</button>
+                    <button class="btn" onclick="appendParenthesis(')')" title="右括号">)</button>
 
                     <!-- Row 5: Numbers 7-9 -->
                     <button class="btn" onclick="appendNumber('7')">7</button>
                     <button class="btn" onclick="appendNumber('8')">8</button>
                     <button class="btn" onclick="appendNumber('9')">9</button>
                     <button class="btn" onclick="appendOperator('+')" title="加法">+</button>
+                    <button class="btn function" onclick="appendOperator('^')" title="幂运算">xʸ</button>
 
                     <!-- Row 6: Numbers 4-6 -->
                     <button class="btn" onclick="appendNumber('4')">4</button>
@@ -87,6 +90,7 @@
             </div>
         </div>
     </div>
+    <div class="angle-control"><button id="angleToggle" class="angle-toggle" onclick="toggleAngleMode()" title="切换角度单位">DEG</button></div>
     <script src="script.js"></script>
 </body>
 </html>
