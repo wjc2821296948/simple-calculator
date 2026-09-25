@@ -34,6 +34,31 @@ for (const name of ['evaluateExpression', 'tokenize', 'appendParenthesis', 'togg
 if (script.includes('eval(')) throw new Error('Unsafe eval() call detected');
 if (!index.includes('aria-label="计算器"')) throw new Error('Missing calculator aria-label');
 
+const expectedRows = {
+  utility: ['%', 'CE', 'C', 'DEL'],
+  advanced: ['1/x', 'x²', '√', '÷'],
+  'numbers-7': ['7', '8', '9', '×'],
+  'numbers-4': ['4', '5', '6', '−'],
+  'numbers-1': ['1', '2', '3', '+'],
+  'numbers-0': ['+/-', '0', '.', '=']
+};
+
+for (const [rowName, labels] of Object.entries(expectedRows)) {
+  const marker = '<div class="button-row" data-row="' + rowName + '">';
+  const start = index.indexOf(marker);
+  if (start === -1) throw new Error('Missing standard keypad row: ' + rowName);
+  const end = index.indexOf('</div>', start);
+  if (end === -1) throw new Error('Unclosed standard keypad row: ' + rowName);
+  const row = index.slice(start, end);
+  const buttons = row.match(/<button\b/g) || [];
+  if (buttons.length !== 4) throw new Error('Every standard keypad row must contain exactly four buttons');
+  for (const label of labels) {
+    if (!row.includes('>' + label + '<')) {
+      throw new Error('Unexpected standard keypad layout in row ' + rowName + ': missing ' + label);
+    }
+  }
+}
+
 const standardRows = [...index.matchAll(/<div class="button-row" data-row="[^"]+">([\\s\\S]*?)<\\/div>/g)];
 if (standardRows.length !== 6) throw new Error('Standard keypad must contain exactly six rows');
 for (const row of standardRows) {
