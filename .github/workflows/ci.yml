@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  javascript:
+    name: JavaScript validation (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          package-manager-cache: false
+
+      - name: Check JavaScript syntax
+        run: node --check script.js
+
+      - name: Run project validation
+        run: node tests/validate.mjs
+
+  http-smoke:
+    name: Static site smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Start local server
+        run: |
+          python3 -m http.server 4173 --directory . > /tmp/simple-calculator-http.log 2>&1 &
+          echo $! > /tmp/simple-calculator-http.pid
+          sleep 1
+
+      - name: Check homepage
+        run: curl --fail --silent --show-error http://127.0.0.1:4173/index.html > /tmp/index.html
+
+      - name: Check static assets
+        run: |
+          curl --fail --silent --show-error http://127.0.0.1:4173/styles.css > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:4173/script.js > /dev/null
+
+      - name: Stop local server
+        if: always()
+        run: kill "$(cat /tmp/simple-calculator-http.pid)" 2>/dev/null || true
