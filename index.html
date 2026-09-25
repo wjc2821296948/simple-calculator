@@ -43,38 +43,41 @@
                     <button class="btn function" onclick="appendFunction('n!')" title="阶乘">n!</button>
                     <button class="btn" onclick="appendOperator('-')" title="减法">-</button>
 
-                    <!-- Row 4: Scientific Mode Buttons (sin, cos, tan, log) -->
+                    <!-- Row 4: Parentheses and Power -->
+                    <button class="btn" onclick="appendParenthesis('(')" title="左括号">(</button>
+                    <button class="btn" onclick="appendParenthesis(')')" title="右括号">)</button>
+                    <button class="btn function" onclick="appendOperator('^')" title="幂运算">xʸ</button>
+                    <button class="btn" onclick="appendOperator('+')" title="加法">+</button>
+
+                    <!-- Row 5: Scientific Mode Buttons (sin, cos, tan, log) -->
                     <button class="btn function scientific-btn" onclick="appendFunction('sin')" title="正弦">sin</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('cos')" title="余弦">cos</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('tan')" title="正切">tan</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('log')" title="对数">log</button>
-                    <button class="btn" onclick="appendParenthesis('(')" title="左括号">(</button>
-                    <button class="btn" onclick="appendParenthesis(')')" title="右括号">)</button>
 
-                    <!-- Row 5: Numbers 7-9 -->
+                    <!-- Row 6: Numbers 7-9 -->
                     <button class="btn" onclick="appendNumber('7')">7</button>
                     <button class="btn" onclick="appendNumber('8')">8</button>
                     <button class="btn" onclick="appendNumber('9')">9</button>
-                    <button class="btn" onclick="appendOperator('+')" title="加法">+</button>
-                    <button class="btn function" onclick="appendOperator('^')" title="幂运算">xʸ</button>
+                    <button class="btn equals" onclick="calculate()" title="计算结果">=</button>
 
                     <!-- Row 6: Numbers 4-6 -->
                     <button class="btn" onclick="appendNumber('4')">4</button>
                     <button class="btn" onclick="appendNumber('5')">5</button>
                     <button class="btn" onclick="appendNumber('6')">6</button>
-                    <button class="btn equals" onclick="calculate()" title="计算结果">=</button>
+                    <button class="btn" onclick="appendNumber('.')">.</button>
 
                     <!-- Row 7: Numbers 1-3 -->
                     <button class="btn" onclick="appendNumber('1')">1</button>
                     <button class="btn" onclick="appendNumber('2')">2</button>
                     <button class="btn" onclick="appendNumber('3')">3</button>
-                    <button class="btn" onclick="appendNumber('.')">.</button>
+                    <button class="btn delete" onclick="deleteLast()">DEL</button>
 
                     <!-- Row 8: Advanced Scientific Functions (ln, e, π) -->
                     <button class="btn function scientific-btn" onclick="appendFunction('ln')" title="自然对数">ln</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('e')" title="欧拉数">e</button>
                     <button class="btn function scientific-btn" onclick="appendFunction('π')" title="圆周率">π</button>
-                    <button class="btn delete" onclick="deleteLast()">DEL</button>
+                    <button class="btn" aria-hidden="true" tabindex="-1" style="visibility:hidden">.</button>
 
                     <!-- Row 9: Zero -->
                     <button class="btn zero" onclick="appendNumber('0')">0</button>
@@ -89,8 +92,9 @@
                 <div class="history-list" id="historyList"></div>
             </div>
         </div>
-    </div>
-    <div class="angle-control"><button id="angleToggle" class="angle-toggle" onclick="toggleAngleMode()" title="切换角度单位">DEG</button></div>
+        <div class="angle-control"><button id="angleToggle" class="angle-toggle" onclick="toggleAngleMode()" title="切换角度单位">DEG</button></div>
+            </div>
+        </div>
     <script src="script.js"></script>
 </body>
 </html>
