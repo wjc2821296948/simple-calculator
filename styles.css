@@ -512,3 +512,72 @@ body {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Standard calculator keypad layout */
+.buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.button-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.scientific-panel {
+    display: none;
+    margin-bottom: 10px;
+}
+
+.scientific-panel.show {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.scientific-panel .scientific-btn {
+    display: block !important;
+    font-size: 14px;
+    padding: 14px 10px;
+}
+
+.grid-spacer {
+    visibility: hidden;
+}
+
+.angle-control {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.angle-toggle {
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn:focus-visible,
+.control-btn:focus-visible,
+.theme-toggle:focus-visible,
+.scientific-toggle:focus-visible,
+.history-clear:focus-visible,
+.history-item-copy:focus-visible,
+.angle-toggle:focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

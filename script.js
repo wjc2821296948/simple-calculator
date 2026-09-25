@@ -164,6 +164,21 @@ function clearDisplay() {
     playBeep(400, 40);
 }
 
+function clearEntry() {
+    if (display.value === 'Error') {
+        clearDisplay();
+        return;
+    }
+
+    const match = display.value.match(/-?(?:\d+(?:\.\d*)?|\.\d+)$/);
+    display.value = match ? display.value.slice(0, -match[0].length) : '';
+
+    updateHistoryIndicator();
+    saveState();
+    animateDisplay();
+    playBeep(450, 35);
+}
+
 // ============ Animation Functions ============
 function animateDisplay() {
     display.style.animation = 'none';
@@ -645,6 +660,9 @@ document.addEventListener('keydown', function(event) {
     } else if (event.key === 'Backspace') {
         event.preventDefault();
         deleteLast();
+    } else if (event.key === 'Delete') {
+        event.preventDefault();
+        clearEntry();
     } else if (event.key === 'Escape') {
         clearDisplay();
     } else if (event.ctrlKey && event.key === 'z') {
