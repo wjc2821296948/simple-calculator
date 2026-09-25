@@ -102,8 +102,10 @@ function loadSoundSetting() {
 function appendNumber(num) {
     if (display.value === '0' && num !== '.') {
         display.value = num;
-    } else if (num === '.' && display.value.includes('.')) {
-        return;
+    } else if (num === '.') {
+        const currentNumber = display.value.split(/[+\-*/^()]/).pop();
+        if (currentNumber.includes('.')) return;
+        display.value += currentNumber === '' ? '0.' : '.';
     } else {
         display.value += num;
     }
@@ -126,7 +128,24 @@ function appendOperator(operator) {
 }
 
 function isOperator(char) {
-    return ['+', '-', '*', '/'].includes(char);
+    return ['+', '-', '*', '/', '^'].includes(char);
+}
+
+function appendParenthesis(value) {
+    if (display.value === 'Error') display.value = '';
+    const last = display.value.slice(-1);
+    if (value === '(') {
+        if (/\d|\)/.test(last)) display.value += '*';
+        display.value += '(';
+    } else {
+        const opens = (display.value.match(/\(/g) || []).length;
+        const closes = (display.value.match(/\)/g) || []).length;
+        if (opens <= closes || isOperator(last) || last === '(' || !display.value) return;
+        display.value += ')';
+    }
+    saveState();
+    animateDisplay();
+    playBeep(700, 30);
 }
 
 function deleteLast() {
@@ -343,11 +362,76 @@ function appendFunction(func) {
 }
 
 // ============ Calculation ============
+function evaluateExpression(expression) {
+    const tokens = tokenize(expression);
+    let position = 0;
+    function parseExpression() {
+        let value = parseTerm();
+        while (tokens[position] === '+' || tokens[position] === '-') {
+            const op = tokens[position++], right = parseTerm();
+            value = op === '+' ? value + right : value - right;
+        }
+        return value;
+    }
+    function parseTerm() {
+        let value = parsePower();
+        while (tokens[position] === '*' || tokens[position] === '/') {
+            const op = tokens[position++], right = parsePower();
+            if (op === '/' && right === 0) throw new Error('Division by zero');
+            value = op === '*' ? value * right : value / right;
+        }
+        return value;
+    }
+    function parsePower() {
+        let value = parseUnary();
+        if (tokens[position] === '^') { position++; value = value ** parsePower(); }
+        return value;
+    }
+    function parseUnary() {
+        if (tokens[position] === '+') { position++; return parseUnary(); }
+        if (tokens[position] === '-') { position++; return -parseUnary(); }
+        return parsePrimary();
+    }
+    function parsePrimary() {
+        const token = tokens[position++];
+        if (token === '(') {
+            const value = parseExpression();
+            if (tokens[position++] !== ')') throw new Error('Missing parenthesis');
+            return value;
+        }
+        if (typeof token === 'number') return token;
+        throw new Error('Invalid expression');
+    }
+    const result = parseExpression();
+    if (position !== tokens.length || !Number.isFinite(result)) throw new Error('Invalid expression');
+    return result;
+}
+
+function tokenize(expression) {
+    const tokens = [];
+    let i = 0;
+    while (i < expression.length) {
+        const char = expression[i];
+        if (/\s/.test(char)) { i++; continue; }
+        if (/\d|\./.test(char)) {
+            const match = expression.slice(i).match(/^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);
+            if (!match) throw new Error('Invalid number');
+            const value = Number(match[0]);
+            if (!Number.isFinite(value)) throw new Error('Invalid number');
+            tokens.push(value); i += match[0].length; continue;
+        }
+        if ('+-*/^()'.includes(char)) { tokens.push(char); i++; continue; }
+        throw new Error('Invalid character');
+    }
+    if (!tokens.length) throw new Error('Empty expression');
+    return tokens;
+}
+
 function calculate() {
     const expression = display.value;
     try {
         if (!expression) return;
-        let result = eval(expression);
+        let result = evaluateExpression(expression);
         result = Math.round(result * 100000000) / 100000000;
         lastCalculation = { expression, result };
         addToHistory(expression, result);
@@ -359,9 +443,7 @@ function calculate() {
         display.value = 'Error';
         playBeep(300, 100);
         animateDisplay();
-        setTimeout(() => {
-            display.value = '';
-        }, 1500);
+        setTimeout(() => { if (display.value === 'Error') display.value = ''; }, 1500);
     }
 }
 
@@ -413,9 +495,9 @@ function clearHistory() {
     }
 }
 
-function copyToClipboard(text) {
+function copyToClipboard(text, btn = null) {
     navigator.clipboard.writeText(text).then(() => {
-        const btn = event.target;
+        if (!btn) return;
         const original = btn.textContent;
         btn.textContent = '✓';
         btn.style.background = '#90EE90';
@@ -493,11 +575,21 @@ function loadTheme() {
 }
 
 document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-if (document.getElementById('soundToggle')) {
-    document.getElementById('soundToggle').addEventListener('click', toggleSound);
-}
 
 // ============ Scientific Mode Toggle ============
+function toggleAngleMode() {
+    angleMode = angleMode === 'deg' ? 'rad' : 'deg';
+    localStorage.setItem('calculatorAngleMode', angleMode);
+    const button = document.getElementById('angleToggle');
+    if (button) button.textContent = angleMode.toUpperCase();
+}
+
+function loadAngleMode() {
+    angleMode = localStorage.getItem('calculatorAngleMode') === 'rad' ? 'rad' : 'deg';
+    const button = document.getElementById('angleToggle');
+    if (button) button.textContent = angleMode.toUpperCase();
+}
+
 function toggleScientificMode() {
     isScientificMode = !isScientificMode;
     const scientificBtns = document.querySelectorAll('.scientific-btn');
@@ -524,6 +616,7 @@ function loadScientificMode() {
 
 document.getElementById('scientificToggle').addEventListener('click', toggleScientificMode);
 loadScientificMode();
+loadAngleMode();
 
 // Initialize undo/redo buttons
 window.addEventListener('load', updateUndoRedoButtons);
@@ -540,6 +633,12 @@ document.addEventListener('keydown', function(event) {
     } else if (event.key === '-' && !event.ctrlKey) {
         event.preventDefault();
         appendOperator(event.key);
+    } else if (event.key === '(' || event.key === ')') {
+        event.preventDefault();
+        appendParenthesis(event.key);
+    } else if (event.key === '^') {
+        event.preventDefault();
+        appendOperator('^');
     } else if (event.key === 'Enter' || event.key === '=') {
         event.preventDefault();
         calculate();
