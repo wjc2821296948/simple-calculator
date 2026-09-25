@@ -473,7 +473,7 @@ function renderHistory() {
                 <div class="expression">${escapeHtml(item.expression)}</div>
                 <div class="result">= ${item.result}</div>
             </div>
-            <button class="history-item-copy" onclick="copyToClipboard('${item.result}')" title="复制结果">📋</button>
+            <button class="history-item-copy" onclick="copyToClipboard('${item.result}', this)" title="复制结果">📋</button>
         `;
         div.querySelector('.history-item-content').onclick = () => {
             display.value = item.result;
